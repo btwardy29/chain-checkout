@@ -1,0 +1,19 @@
+{
+  "name": "@chain-checkout/shared",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "viem": "^2.31.0",
+    "zod": "^3.25.32"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.4"
+  }
+}

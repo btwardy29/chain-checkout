@@ -1,0 +1,13 @@
+.git
+.next
+**/.next
+**/dist
+**/node_modules
+**/.turbo
+**/coverage
+**/.env
+**/.env.*
+!.env.production.example
+Dockerfile
+docker-compose*.yml
+README.md

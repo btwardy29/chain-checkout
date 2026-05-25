@@ -1,0 +1,21 @@
+{
+  "name": "chain-checkout",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "infra:up": "docker compose up -d",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "db:generate": "pnpm --filter @chain-checkout/api db:generate",
+    "db:migrate": "pnpm --filter @chain-checkout/api db:migrate",
+    "db:push": "pnpm --filter @chain-checkout/api db:push",
+    "db:seed": "pnpm --filter @chain-checkout/api db:seed",
+    "db:sync-payment-config": "pnpm --filter @chain-checkout/api db:sync-payment-config"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.3",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@10.11.0"
+}

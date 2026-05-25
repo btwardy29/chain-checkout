@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  created
+  awaiting_payment
+  transaction_submitted
+  confirming
+  paid
+  failed
+  expired
+  underpaid
+  wrong_network
+  wrong_token
+  duplicate_transaction
+  cancelled
+}
+
+enum PaymentStatus {
+  submitted
+  confirming
+  confirmed
+  failed
+  rejected
+}
+
+model User {
+  id            String        @id @default(cuid())
+  walletAddress String        @unique
+  nonces        AuthNonce[]
+  orders        Order[]
+  entitlements  Entitlement[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model AuthNonce {
+  id            String   @id @default(cuid())
+  walletAddress String
+  nonce         String   @unique
+  expiresAt     DateTime
+  usedAt        DateTime?
+  createdAt     DateTime @default(now())
+  user          User?    @relation(fields: [walletAddress], references: [walletAddress])
+
+  @@index([walletAddress])
+}
+
+model Product {
+  id             String        @id
+  name           String
+  slug           String        @unique
+  description    String
+  accessUrl      String
+  thumbnail      String
+  priceAmount    String
+  priceDecimals  Int
+  tokenSymbol    String
+  tokenAddress   String
+  chainId         Int
+  isActive        Boolean       @default(true)
+  orders          Order[]
+  entitlements    Entitlement[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Order {
+  id                     String         @id @default(cuid())
+  userId                 String
+  productId              String
+  status                 OrderStatus    @default(created)
+  expectedAmount         String
+  expectedTokenAddress   String
+  expectedChainId        Int
+  expectedPayerAddress   String
+  paymentContractAddress String
+  onChainOrderId         String         @unique
+  txHash                 String?        @unique
+  idempotencyKey         String?
+  expiresAt              DateTime
+  user                   User           @relation(fields: [userId], references: [id])
+  product                Product        @relation(fields: [productId], references: [id])
+  payment                Payment?
+  entitlement            Entitlement?
+  events                 PaymentEvent[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+  @@unique([userId, idempotencyKey])
+}
+
+model Payment {
+  id            String         @id @default(cuid())
+  orderId       String         @unique
+  txHash        String         @unique
+  payerAddress  String
+  tokenAddress  String
+  amount        String
+  chainId       Int
+  blockNumber   BigInt?
+  confirmations Int            @default(0)
+  status        PaymentStatus
+  order         Order          @relation(fields: [orderId], references: [id])
+  events        PaymentEvent[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Entitlement {
+  id        String    @id @default(cuid())
+  userId    String
+  productId String
+  orderId   String    @unique
+  grantedAt DateTime  @default(now())
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+  order     Order     @relation(fields: [orderId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, productId])
+}
+
+model PaymentEvent {
+  id          String   @id @default(cuid())
+  orderId     String
+  paymentId   String?
+  type        String
+  payloadJson Json
+  order       Order    @relation(fields: [orderId], references: [id])
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([orderId])
+  @@index([type])
+}
