@@ -46,6 +46,19 @@ const products = [
     tokenSymbol: "TEST-USDC",
     tokenAddress,
     chainId
+  },
+    {
+    id: "prod_web3_template",
+    name: "Designer Figma Kit",
+    slug: "designer-figma-kit",
+    description: "Are you waiting for a designer? ARE YOU WAITING FOR A DESIGNER? This kit includes pre-made components, icons, and styles to help you design faster.",
+    accessUrl: "https://example.com/downloads/designer-figma-kit",
+    thumbnail: "/products/figma-kit.jpg",
+    priceAmount: "1000000",
+    priceDecimals: 6,
+    tokenSymbol: "TEST-USDC",
+    tokenAddress,
+    chainId
   }
 ];
 
